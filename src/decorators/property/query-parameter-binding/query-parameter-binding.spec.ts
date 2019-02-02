@@ -49,6 +49,8 @@ describe("@QueryParameterBinding", () => {
     class TestComponentNonStringType {
         @QueryParameterBinding("property")
         public property = 1;
+        @QueryParameterBinding("object")
+        public property2 = {};
     }
 
     const createTestComponent = () => {
@@ -91,7 +93,7 @@ describe("@QueryParameterBinding", () => {
             expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
-        it("should initialize query parameter value with property on init when query parameter not is present", () => {
+        it("should initialize query parameter with property value on init when query parameter not is present", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?other-param=true"));
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
@@ -218,7 +220,7 @@ describe("@QueryParameterBinding", () => {
             expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
-        it("should initialize query parameter value with property on init when query parameter not is present", () => {
+        it("should initialize query parameter with property value on init when query parameter not is present", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?other-param=true"));
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
@@ -320,11 +322,17 @@ describe("@QueryParameterBinding", () => {
             testComponentNonStringType.property = 2;
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
-                "Enabling useJSON is recommended for non-string type properties in TestComponentNonStringType#property (number)");
+                "@QueryParameterBinding: Enabling useJSON is recommended for " +
+                "non-string type properties in TestComponentNonStringType#property (typeof number)");
 
-            expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(2);
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                "@QueryParameterBinding: Enabling useJSON is recommended for " +
+                "non-string type properties in TestComponentNonStringType#property2 (typeof object)");
+
+            expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(3);
             expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=1");
-            expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=2");
+            expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=1&object=%5Bobject+Object%5D");
+            expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=2&object=%5Bobject+Object%5D");
         });
     });
 });

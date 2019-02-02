@@ -38,7 +38,7 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
      *
      * @return The parameter value or null if absent
      */
-    const getQueryParameterValue = function (): any {
+    const getQueryParameterValue = (): any => {
         const urlParams = BrowserContext.getQueryParameters();
 
         if (urlParams.has(param)) {
@@ -57,7 +57,7 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
      *
      * @param value The (new) value
      */
-    const setQueryParameterValue = function (value: any) {
+    const setQueryParameterValue = (value: any) => {
         const urlParams = BrowserContext.getQueryParameters();
         const originalParamsString = urlParams.toString();
 
@@ -116,8 +116,8 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
                 // If any other than string log warning
                 const type = typeof initialValue;
                 if (!opts.useJSON && initialValue != null && type !== "string") {
-                    console.warn("Enabling useJSON is recommended for non-string type properties in "
-                        + `${target.constructor.name}#${key} (${type})`);
+                    console.warn("@QueryParameterBinding: Enabling useJSON is recommended for non-string type properties in "
+                        + `${target.constructor.name}#${key} (typeof ${type})`);
                 }
 
                 // Replace instance property with getter/setter to bind query
