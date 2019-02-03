@@ -7,9 +7,9 @@ Then, whenever the property is updated, the query parameter will be updated to r
 ### Factory parameters:
 * `param: string` The name of the query parameter to bind to.
 * `opts: BindingOptions` Options for binding.
-    * `pushHistoryState?: boolean` Use push changes to the history stack.  
+    * `pushHistoryState?: boolean` Push changes to the history stack.  
     This causes each parameter change to be a new item in the browser's history.  
-    _By default the current item in history stack will be replaced.
+    _By default the current item in history stack will be replaced._
     * `useJSON?: boolean` Use JSON conversion when writing to-/reading from the query parameter  
     Useful when you want to store non-string type values in the query parameter.
 
@@ -78,3 +78,6 @@ A: No, only updated properties will have their getter called
 
 * Q: What happens if I ommit the `@InitQueryParameterBindings`?  
 A: Primitive properties will still get bound, but getter/setter properties will not.
+
+* Q: If I update an object property, will it get reflected to the query parameter?  
+A: No, the query parameters are only updated when the properties itself changes.
