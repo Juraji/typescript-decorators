@@ -74,6 +74,11 @@ foo.quux = {hello: "world"};
 foo.quux.hello = "user";
 // The url will still be:
 // https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D
+
+// Only when the object itself changes will the query parameter update:
+foo.quux.hello = {hello: "user"};
+// The url will change to:
+// https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22user%22%7D
 ```
 
 ## FAQ
