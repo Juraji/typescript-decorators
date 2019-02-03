@@ -1,12 +1,14 @@
 import { Component } from "@angular/core";
-import { QueryParameterBinding } from "../decorators/property/query-parameter-binding/query-parameter-binding";
+import { InitQueryParameterBindings, QueryParameterBinding } from "decorators";
 
 @Component({
     selector: "app-root",
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.css"]
 })
+@InitQueryParameterBindings
 export class AppComponent {
+
     @QueryParameterBinding("private-property")
     private _privateProperty = "";
 
