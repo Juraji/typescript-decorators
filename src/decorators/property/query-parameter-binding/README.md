@@ -68,5 +68,13 @@ foo.qux = null;
 foo.quux = {hello: "world"}
 
 // Causes the browser url to change to:
-// https://example.com/?bar=New+bar&baz=New+baz&quux=%7Bhello%3A%22world%22%7D
+// https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D
 ```
+
+## FAQ
+
+* Q: Does every parameter getter get recalculated on change?  
+A: No, only updated properties will have their getter called
+
+* Q: What happens if I ommit the @InitQueryParameterBindings?  
+A: Primitive properties will still get bound, but getter/setter properties will not.
