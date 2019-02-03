@@ -2,7 +2,10 @@
 
 Several convenient decorators to use in Angular projects
 
-_The decorators are wrapped within an Angular CLI project for ease of development._
-_The decorators and their respective test files are in `src/decorators`, categorized by target._
+### Where's the code?!
+The decorators are wrapped within an Angular CLI project for ease of development.
+The decorators and their respective test files are in `projects/decorators`, categorized by target.
+Checkout [Angular's Github on "stories create library"](https://github.com/angular/angular-cli/wiki/stories-create-library)_, for more info on how to work with angular libraries
 
 *Tips or additions are always welcome*
+*I have not yet placed the library on NPM, since it currently only has one decorator. This might change in the future.*
