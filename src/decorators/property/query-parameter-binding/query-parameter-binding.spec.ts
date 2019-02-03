@@ -53,18 +53,20 @@ describe("@QueryParameterBinding", () => {
         public property2 = {};
     }
 
+    // Mimic Angular's OnInit call, since getter/setter
+    // bindings are initialized that way
     const createTestComponent = () => {
         const testComponent = new TestComponent();
-        // Mimic Angular calling ngOnInit
         if (testComponent["ngOnInit"]) {
             testComponent["ngOnInit"]();
         }
         return testComponent;
     };
 
+    // Mimic Angular's OnInit call, since getter/setter
+    // bindings are initialized that way
     const createTestComponentWithJSON = () => {
         const testComponent = new TestComponentWithJSON();
-        // Mimic Angular calling ngOnInit
         if (testComponent["ngOnInit"]) {
             testComponent["ngOnInit"]();
         }
