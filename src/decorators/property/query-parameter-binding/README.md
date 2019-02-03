@@ -1,4 +1,4 @@
-# @QueryParameterBinding
+# Property decorator: `@QueryParameterBinding`
 
 Bind class properties to URL query parameters.  
 When the class is instantiated the class property will get updated with the value.
@@ -76,5 +76,5 @@ foo.quux = {hello: "world"}
 * Q: Does every parameter getter get recalculated on change?  
 A: No, only updated properties will have their getter called
 
-* Q: What happens if I ommit the @InitQueryParameterBindings?  
+* Q: What happens if I ommit the `@InitQueryParameterBindings`?  
 A: Primitive properties will still get bound, but getter/setter properties will not.
