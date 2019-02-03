@@ -65,9 +65,14 @@ const foo = new Foo();
 foo.bar = "New bar";
 foo.baz = "New baz";
 foo.qux = null;
-foo.quux = {hello: "world"}
+foo.quux = {hello: "world"};
 
 // Causes the browser url to change to:
+// https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D
+
+// Side note: Changes to object properties are ignored:
+foo.quux.hello = "user";
+// The url will still be:
 // https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D
 ```
 
