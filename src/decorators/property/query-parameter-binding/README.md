@@ -9,7 +9,7 @@ Then, whenever the property is updated, the query parameter will be updated to r
 * `opts: BindingOptions` Options for binding.
     * `pushHistoryState?: boolean` Use push changes to the history stack.  
     This causes each parameter change to be a new item in the browser's history.  
-    _By default the current item in history stack will be replaced._
+    _By default the current item in history stack will be replaced.
     * `useJSON?: boolean` Use JSON conversion when writing to-/reading from the query parameter  
     Useful when you want to store non-string type values in the query parameter.
 
@@ -49,10 +49,16 @@ class Foo {
     public set baz(value: string) {
         this._baz = value;
     }
+    
+    @QueryParameterBinding("corge", {useJSON: true})
+    public get corge(): number {
+        // Getter only with logic output
+        return 1 + 2;
+    }
 }
 
 // Initializing an instance of Foo will cause the browser url to change to:
-// https://example.com/?bar=Default+bar&qux=Default+qux
+// https://example.com/?bar=Default+bar&qux=Default+qux&corge=3
 const foo = new Foo();
 
 // Then applying some values:
