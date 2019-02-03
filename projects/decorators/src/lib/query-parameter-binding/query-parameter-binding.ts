@@ -13,7 +13,7 @@ export function InitQueryParameterBindings<T extends Function>(target: T): any {
     const orgConstructor: T = target;
 
     const _QueryParameterBindingsWrapper = function (...args: any[]) {
-        const descriptors: Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>> = this.__proto__[PROP_DESCRIPTORS];
+        const descriptors: Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>> = target.prototype[PROP_DESCRIPTORS];
         const instance = orgConstructor.apply(this, args);
 
         if (descriptors) {
