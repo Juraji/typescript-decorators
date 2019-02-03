@@ -1,4 +1,5 @@
-import { BrowserContext, InitQueryParameterBindings, QueryParameterBinding } from "./query-parameter-binding";
+import { InitQueryParameterBindings, QueryParameterBinding } from "./query-parameter-binding";
+import { BrowserContext } from "../browser-context";
 
 describe("@QueryParameterBinding", () => {
 

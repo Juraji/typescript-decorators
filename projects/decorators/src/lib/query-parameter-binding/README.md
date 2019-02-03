@@ -18,7 +18,7 @@ Getter/Setter property initialization only works when the `@InitQueryParameterBi
 
 ## Example
 ```typescript
-import {InitQueryParameterBindings, QueryParameterBinding} from "./query-parameter-binding"
+import {InitQueryParameterBindings, QueryParameterBinding} from "decorators";
 
 // Apply the query parameters like this: 
 @InitQueryParameterBindings
