@@ -1,13 +1,11 @@
-import { BrowserContext, QueryParameterBinding } from "./query-parameter-binding";
-import { OnInit } from "@angular/core";
+import { BrowserContext, InitQueryParameterBindings, QueryParameterBinding } from "./query-parameter-binding";
 
 describe("@QueryParameterBinding", () => {
 
-    class TestComponent implements OnInit {
+    @InitQueryParameterBindings
+    class TestClassMixed {
         public _getSetProperty = "Default value";
         public _getSetPropertyNoDefault: string;
-
-        public originalOnInitCalled = false;
 
         @QueryParameterBinding("property-param")
         public primitiveProperty = "Default value";
@@ -32,13 +30,11 @@ describe("@QueryParameterBinding", () => {
         public set getSetPropertyNoDefault(value: string) {
             this._getSetPropertyNoDefault = value;
         }
-
-        public ngOnInit(): void {
-            this.originalOnInitCalled = true;
-        }
     }
 
-    class TestComponentWithJSON {
+    @InitQueryParameterBindings
+    class TestClassWithJSON {
+
         @QueryParameterBinding("property-no-default", {useJSON: true})
         public propertyNoDefault: any;
 
@@ -46,32 +42,23 @@ describe("@QueryParameterBinding", () => {
         public property: any = {prop: true};
     }
 
-    class TestComponentNonStringType {
+    @InitQueryParameterBindings
+    class TestClassNonStringType {
+
         @QueryParameterBinding("property")
         public property = 1;
         @QueryParameterBinding("object")
         public property2 = {};
     }
 
-    // Mimic Angular's OnInit call, since getter/setter
-    // bindings are initialized that way
-    const createTestComponent = () => {
-        const testComponent = new TestComponent();
-        if (testComponent["ngOnInit"]) {
-            testComponent["ngOnInit"]();
-        }
-        return testComponent;
-    };
+    @InitQueryParameterBindings
+    class TestClassWithGetLogic {
 
-    // Mimic Angular's OnInit call, since getter/setter
-    // bindings are initialized that way
-    const createTestComponentWithJSON = () => {
-        const testComponent = new TestComponentWithJSON();
-        if (testComponent["ngOnInit"]) {
-            testComponent["ngOnInit"]();
+        @QueryParameterBinding("doc-title")
+        public get getPropertyWithLogic(): string {
+            return document.title;
         }
-        return testComponent;
-    };
+    }
 
     beforeEach(() => {
         spyOn(BrowserContext, "getPath").and.returnValue("#/test");
@@ -83,7 +70,7 @@ describe("@QueryParameterBinding", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?property-param=Test+value&other-param=true"));
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
+            const testComponent = new TestClassMixed();
 
             expect(testComponent.primitiveProperty).toEqual("Test value");
 
@@ -92,14 +79,13 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
         it("should initialize query parameter with property value on init when query parameter not is present", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?other-param=true"));
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
+            const testComponent = new TestClassMixed();
 
             expect(testComponent.primitiveProperty).toEqual("Default value");
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(1);
@@ -107,7 +93,6 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
 
@@ -115,7 +100,7 @@ describe("@QueryParameterBinding", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?other-param=true"));
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
+            const testComponent = new TestClassMixed();
 
             expect(testComponent.primitivePropertyNoDefault).toBe(undefined);
 
@@ -128,7 +113,6 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
         it("should write property changes to the query parameter", () => {
@@ -136,7 +120,7 @@ describe("@QueryParameterBinding", () => {
                 "?property-param=Initial+value&other-param=true"));
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
+            const testComponent = new TestClassMixed();
 
             // Check initial parameter
             expect(BrowserContext.getQueryParameters().has("property-param")).toBe(true);
@@ -170,7 +154,6 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
     });
 
@@ -179,8 +162,7 @@ describe("@QueryParameterBinding", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?other-param=true"));
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
-            testComponent.ngOnInit();
+            const testComponent = new TestClassMixed();
 
             expect(testComponent.getSetPropertyNoDefault).toBe(null);
 
@@ -201,15 +183,13 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
         it("should initialize property with query parameter value on init when query parameter is present", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?get-set-param=Test+value&other-param=true"));
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
-            testComponent.ngOnInit();
+            const testComponent = new TestClassMixed();
 
             expect(testComponent.getSetProperty).toEqual("Test value");
             expect(testComponent._getSetProperty).toEqual("Test value");
@@ -219,15 +199,13 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
         it("should initialize query parameter with property value on init when query parameter not is present", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?other-param=true"));
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
-            testComponent.ngOnInit();
+            const testComponent = new TestClassMixed();
 
             expect(testComponent.getSetProperty).toEqual("Default value");
             expect(pushHistoryStateSpy).toHaveBeenCalledTimes(1);
@@ -236,7 +214,6 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
 
         it("should write property changes to the query parameter", () => {
@@ -244,8 +221,7 @@ describe("@QueryParameterBinding", () => {
                 "?get-set-param=Initial+value&other-param=true"));
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
-            const testComponent = createTestComponent();
-            testComponent.ngOnInit();
+            const testComponent = new TestClassMixed();
 
             // Check initial parameter
             expect(BrowserContext.getQueryParameters().has("get-set-param")).toBe(true);
@@ -278,7 +254,6 @@ describe("@QueryParameterBinding", () => {
 
             // It should not affect other params
             expect(BrowserContext.getQueryParameters().get("other-param")).toEqual("true");
-            expect(testComponent.originalOnInitCalled).toBe(true);
         });
     });
 
@@ -287,7 +262,7 @@ describe("@QueryParameterBinding", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams());
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
-            const testComponentWithJSON = createTestComponentWithJSON();
+            const testComponentWithJSON = new TestClassWithJSON();
 
             testComponentWithJSON.propertyNoDefault = {prop: "Some string"};
             testComponentWithJSON.property = null;
@@ -305,7 +280,7 @@ describe("@QueryParameterBinding", () => {
                 "?property=%7B%22prop%22%3A%22Some+string%22%7D"));
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
-            const testComponentWithJSON = createTestComponentWithJSON();
+            const testComponentWithJSON = new TestClassWithJSON();
 
             expect(testComponentWithJSON.property).toEqual({prop: "Some string"});
 
@@ -320,21 +295,44 @@ describe("@QueryParameterBinding", () => {
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
             const consoleWarnSpy = spyOn(console, "warn").and.callThrough();
 
-            const testComponentNonStringType = new TestComponentNonStringType();
+            const testComponentNonStringType = new TestClassNonStringType();
             testComponentNonStringType.property = 2;
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "@QueryParameterBinding: Enabling useJSON is recommended for " +
-                "non-string type properties in TestComponentNonStringType#property (typeof number)");
+                "non-string type properties in TestClassNonStringType#property (typeof number)");
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "@QueryParameterBinding: Enabling useJSON is recommended for " +
-                "non-string type properties in TestComponentNonStringType#property2 (typeof object)");
+                "non-string type properties in TestClassNonStringType#property2 (typeof object)");
 
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(3);
             expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=1");
             expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=1&object=%5Bobject+Object%5D");
             expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=2&object=%5Bobject+Object%5D");
+        });
+    });
+
+    describe("with getter only", () => {
+        it("should update the query parameters using the getter", () => {
+            spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams());
+            const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
+
+            // tslint:disable-next-line
+            new TestClassWithGetLogic();
+
+            expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(1);
+            expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?doc-title=");
+        });
+
+        it("should NOT update the query parameters if query parameter was already present", () => {
+            spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?doc-title=Karma"));
+            const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
+
+            // tslint:disable-next-line
+            new TestClassWithGetLogic();
+
+            expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(0);
         });
     });
 });

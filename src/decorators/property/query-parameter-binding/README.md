@@ -1,0 +1,64 @@
+# @QueryParameterBinding
+
+Bind class properties to URL query parameters.  
+When the class is instantiated the class property will get updated with the value.
+Then, whenever the property is updated, the query parameter will be updated to reflect the new value.
+
+### Factory parameters:
+* `param: string` The name of the query parameter to bind to.
+* `opts: BindingOptions` Options for binding.
+    * `pushHistoryState?: boolean` Use push changes to the history stack.  
+    This causes each parameter change to be a new item in the browser's history.
+    * `useJSON?: boolean` Use JSON conversion when writing to-/reading from the query parameter  
+    Useful when you want to store non-string type values in the query parameter.
+
+### Important
+Getter/Setter property initialization only works when the `@InitQueryParameterBindings` decorator is applied to the parent class.
+
+## Example
+```typescript
+import{InitQueryParameterBindings, QueryParameterBinding} from "./query-parameter-binding"
+
+// Apply the query parameters like this: 
+@InitQueryParameterBindings
+class Foo {
+    public _bar = "Default bar";
+    public _baz: string;
+
+    @QueryParameterBinding("qux")
+    public qux = "Default qux";
+
+    @QueryParameterBinding("quux")
+    public quux: string;
+
+    @QueryParameterBinding("bar", {pushHistoryState: true})
+    public get bar(): string {
+        return this._bar;
+    }
+
+    public set bar(value: string) {
+        this._bar = value;
+    }
+
+    @QueryParameterBinding("baz", {pushHistoryState: true})
+    public get baz(): string {
+        return this._baz;
+    }
+
+    public set baz(value: string) {
+        this._baz = value;
+    }
+}
+
+// Initializing an instance of Foo will cause the browser url to change to:
+// https://example.com/?bar=Default+bar&qux=Default+qux
+const foo = new Foo();
+
+// Then applying some values:
+foo.bar = "New bar";
+foo.baz = "New baz";
+foo.qux = null;
+
+// Causes the browser url to change to:
+// https://example.com/?bar=New+bar&baz=New+baz
+```

@@ -1,3 +1,5 @@
+const PROP_DESCRIPTORS = "__QPBPropertyDescriptors";
+
 export interface BindingOptions {
     // Use the history API to replace the current state
     pushHistoryState?: boolean;
@@ -23,7 +25,36 @@ export class BrowserContext {
 }
 
 /**
- * Decorator factory
+ * Class decorator for initializing @QueryParameterBinding
+ * See the README.md for more info
+ *
+ * @param target The target class/constructor
+ */
+export function InitQueryParameterBindings<T extends Function>(target: T): any {
+    const orgConstructor: T = target;
+
+    const _QueryParameterBindingsWrapper = function (...args: any[]) {
+        const qpbDescriptors: Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>> = this.__proto__[PROP_DESCRIPTORS];
+        const instance = orgConstructor.apply(this, args);
+
+        if (qpbDescriptors) {
+            qpbDescriptors.forEach((wrapperDescriptor, orgDescriptor) => {
+                wrapperDescriptor.set.apply(this, [orgDescriptor.get.apply(this)]);
+            });
+        }
+
+        return instance;
+    };
+
+    _QueryParameterBindingsWrapper.prototype = orgConstructor.prototype;
+
+    return _QueryParameterBindingsWrapper;
+}
+
+/**
+ * Property decorator factory
+ * Requires @InitQueryParameterBindings to be present on parent class,
+ * see README.md for more info
  *
  * Use the binding options to bind instance properties to query parameters
  *
@@ -82,31 +113,35 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
         }
     };
 
+    /**
+     * Registers the original and new descriptor object to the prototype of target under key PROP_DESCRIPTORS.
+     * This is later used by @InitQueryParameterBindings to init get/set properties
+     *
+     * @param target The target class
+     * @param newDescriptor The new descriptor
+     * @param orgDescriptor The original descriptor
+     */
+    const registerPropertyDescriptor = (target: any, newDescriptor, orgDescriptor) => {
+        if (target && orgDescriptor && newDescriptor) {
+            target[PROP_DESCRIPTORS] = target[PROP_DESCRIPTORS] || new Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>>();
+            target[PROP_DESCRIPTORS].set(orgDescriptor, newDescriptor);
+        }
+    };
+
+    /**
+     * Call (safely) the descriptor setter using value in context
+     * @param descriptor The descriptor to call
+     * @param value The value to apply as parameter ot set
+     * @param context The context to apply the setter in
+     */
     const callDescriptorSetter = (descriptor: TypedPropertyDescriptor<any>, value: any, context: ThisType<any>) => {
         if (descriptor && descriptor.set) {
             descriptor.set.apply(context, [value]);
         }
     };
 
-    return (target: any, key: string, descriptor?: TypedPropertyDescriptor<any>): any => {
-        if (descriptor) {
-            // Get/set properties need to have their setter called explicitly,
-            // Use/wrap Angular's OnInit hook to initialize
-            // Todo: Find a method to init setters, without having to rely on Angular to call #ngOnInit
-            const orgOnInit = target.constructor.prototype.ngOnInit;
-            target.constructor.prototype.ngOnInit = function () {
-                if (descriptor.get) {
-                    this[key] = descriptor.get.apply(this);
-                } else {
-                    this[key] = null;
-                }
-                if (orgOnInit) {
-                    orgOnInit.apply(this);
-                }
-            };
-        }
-
-        return {
+    return function (target: any, key: string, descriptor?: TypedPropertyDescriptor<any>): any {
+        const wrapperDescriptor = {
             configurable: true,
             enumerable: true,
             set: function (initialValue: any) {
@@ -140,5 +175,8 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
                 callDescriptorSetter(descriptor, queryParameterValue || initialValue, this);
             }
         };
+
+        registerPropertyDescriptor(target, wrapperDescriptor, descriptor);
+        return wrapperDescriptor;
     };
 }
