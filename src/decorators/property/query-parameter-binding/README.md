@@ -83,11 +83,14 @@ foo.quux.hello = {hello: "user"};
 
 ## FAQ
 
-* Q: Does every parameter getter get recalculated on change?  
+* __Q: Does every parameter getter get recalculated on change?__  
 A: No, only updated properties will have their getter called
 
-* Q: What happens if I ommit the `@InitQueryParameterBindings`?  
+* __Q: What happens if I ommit the `@InitQueryParameterBindings`?__  
 A: Primitive properties will still get bound, but getter/setter properties will not.
 
-* Q: If I update an object property, will it get reflected to the query parameter?  
+* __Q: If I update an object property, will it get reflected to the query parameter?__  
 A: No, the query parameters are only updated when the properties itself changes.
+
+* __Q: What is `__QPBPropertyDescriptors`, when i check the class prototype in the browser console.__  
+A: This is a registry of property descriptors, used by `@InitQueryParameterBindings` to initialize query parameter binding for getter/setter properties

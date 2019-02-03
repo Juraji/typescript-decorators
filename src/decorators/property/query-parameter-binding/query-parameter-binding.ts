@@ -6,6 +6,9 @@ export interface BindingOptions {
     useJSON?: boolean;
 }
 
+/**
+ * Abstraction layer for browser context specific logic
+ */
 export class BrowserContext {
     public static getQueryParameters(): URLSearchParams {
         return new URLSearchParams(window.location.search);
@@ -34,11 +37,11 @@ export function InitQueryParameterBindings<T extends Function>(target: T): any {
     const orgConstructor: T = target;
 
     const _QueryParameterBindingsWrapper = function (...args: any[]) {
-        const qpbDescriptors: Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>> = this.__proto__[PROP_DESCRIPTORS];
+        const descriptors: Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>> = this.__proto__[PROP_DESCRIPTORS];
         const instance = orgConstructor.apply(this, args);
 
-        if (qpbDescriptors) {
-            qpbDescriptors.forEach((wrapperDescriptor, orgDescriptor) => {
+        if (descriptors) {
+            descriptors.forEach((wrapperDescriptor, orgDescriptor) => {
                 wrapperDescriptor.set.apply(this, [orgDescriptor.get.apply(this)]);
             });
         }
