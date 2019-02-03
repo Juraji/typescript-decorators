@@ -18,7 +18,7 @@ Getter/Setter property initialization only works when the `@InitQueryParameterBi
 
 ## Example
 ```typescript
-import{InitQueryParameterBindings, QueryParameterBinding} from "./query-parameter-binding"
+import {InitQueryParameterBindings, QueryParameterBinding} from "./query-parameter-binding"
 
 // Apply the query parameters like this: 
 @InitQueryParameterBindings
@@ -56,33 +56,40 @@ class Foo {
         return 1 + 2;
     }
 }
+```
 
-// Initializing an instance of Foo will cause the browser url to change to:
-// https://example.com/?bar=Default+bar&qux=Default+qux&corge=3
+Initializing an instance of Foo will cause the browser url to change to: `https://example.com/?bar=Default+bar&qux=Default+qux&corge=3`
+
+```typescript
 const foo = new Foo();
+```
 
-// Then applying some values:
+Then applying some values:
+
+```typescript
 foo.bar = "New bar";
 foo.baz = "New baz";
 foo.qux = null;
 foo.quux = {hello: "world"};
-
-// Causes the browser url to change to:
-// https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D
-
-// Side note: Changes to object properties are ignored:
-foo.quux.hello = "user";
-// The url will still be:
-// https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D
-
-// Only when the object itself changes will the query parameter update:
-foo.quux.hello = {hello: "user"};
-// The url will change to:
-// https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22user%22%7D
 ```
 
-## FAQ
+Causes the browser url to change to: `https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D`
 
+Side note: Changes to object properties are ignored:
+```typescript
+foo.quux.hello = "user";
+```
+
+The url will still be: `https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22world%22%7D`
+
+Only when the object itself changes will the query parameter update:
+```typescript
+foo.quux = {hello: "user"};
+```
+
+The url will change to: `https://example.com/?bar=New+bar&baz=New+baz&corge=3&quux=%7Bhello%3A%22user%22%7D`
+
+## FAQ
 * __Q: Does every parameter getter get recalculated on change?__  
 A: No, only updated properties will have their getter called
 
