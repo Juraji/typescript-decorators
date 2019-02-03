@@ -8,7 +8,8 @@ Then, whenever the property is updated, the query parameter will be updated to r
 * `param: string` The name of the query parameter to bind to.
 * `opts: BindingOptions` Options for binding.
     * `pushHistoryState?: boolean` Use push changes to the history stack.  
-    This causes each parameter change to be a new item in the browser's history.
+    This causes each parameter change to be a new item in the browser's history.  
+    _By default the current item in history stack will be replaced._
     * `useJSON?: boolean` Use JSON conversion when writing to-/reading from the query parameter  
     Useful when you want to store non-string type values in the query parameter.
 
@@ -28,8 +29,8 @@ class Foo {
     @QueryParameterBinding("qux")
     public qux = "Default qux";
 
-    @QueryParameterBinding("quux")
-    public quux: string;
+    @QueryParameterBinding("quux", {useJSON: true})
+    public quux: any;
 
     @QueryParameterBinding("bar", {pushHistoryState: true})
     public get bar(): string {
@@ -58,7 +59,8 @@ const foo = new Foo();
 foo.bar = "New bar";
 foo.baz = "New baz";
 foo.qux = null;
+foo.quux = {hello: "world"}
 
 // Causes the browser url to change to:
-// https://example.com/?bar=New+bar&baz=New+baz
+// https://example.com/?bar=New+bar&baz=New+baz&quux=%7Bhello%3A%22world%22%7D
 ```

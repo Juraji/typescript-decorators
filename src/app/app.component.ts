@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { QueryParameterBinding } from "../decorators/property/query-parameter-binding/query-parameter-binding";
 
 @Component({
     selector: "app-root",
@@ -6,5 +7,13 @@ import { Component } from "@angular/core";
     styleUrls: ["./app.component.css"]
 })
 export class AppComponent {
-    title = "typescript-decorators";
+    @QueryParameterBinding("private-property")
+    private _privateProperty = "";
+
+    @QueryParameterBinding("title")
+    public title = "typescript-decorators";
+
+    public get privateProperty(): string {
+        return this._privateProperty;
+    }
 }
