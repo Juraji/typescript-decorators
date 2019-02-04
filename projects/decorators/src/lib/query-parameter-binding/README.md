@@ -94,10 +94,10 @@ The url will change to: `https://example.com/?bar=New+bar&baz=New+baz&corge=3&qu
 A: No, only updated properties will have their getter called
 
 * __Q: What happens if I ommit the `@InitQueryParameterBindings`?__  
-A: Primitive properties will still get bound, but getter/setter properties will not.
+A: Things will get unpredictable like binding not occur, until bound properties are set with a value.
 
 * __Q: If I update an object property, will it get reflected to the query parameter?__  
 A: No, the query parameters are only updated when the properties itself changes.
 
-* __Q: What is `__QPBPropertyDescriptors`, when i check the class prototype in the browser console.__  
+* __Q: What is `__QPBPropertyDescriptors`, when I check the class prototype in the browser console.__  
 A: This is a registry of property descriptors, used by `@InitQueryParameterBindings` to initialize query parameter binding for getter/setter properties

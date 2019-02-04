@@ -1,7 +1,18 @@
 import { BrowserContext } from "../browser-context";
-import { BindingOptions } from "./binding-options.interface";
 
 const PROP_DESCRIPTORS = "__QPBPropertyDescriptors";
+
+interface PropertyDescriptorSet {
+    original: TypedPropertyDescriptor<any>;
+    wrapped: TypedPropertyDescriptor<any>;
+}
+
+interface BindingOptions {
+    // Use the history API to replace the current state
+    pushHistoryState?: boolean;
+    // Use JSON (de)serialisation
+    useJSON?: boolean;
+}
 
 /**
  * Class decorator for initializing @QueryParameterBinding
@@ -9,25 +20,29 @@ const PROP_DESCRIPTORS = "__QPBPropertyDescriptors";
  *
  * @param target The target class/constructor
  */
-export function InitQueryParameterBindings<T extends Function>(target: T): any {
-    const orgConstructor: T = target;
+export function InitQueryParameterBindings<T extends Function>(target: T) {
+    const orgOnInit: T = target.prototype.ngOnInit;
+    const descriptors: Map<string, PropertyDescriptorSet> = target.prototype[PROP_DESCRIPTORS];
 
-    const _QueryParameterBindingsWrapper = function (...args: any[]) {
-        const descriptors: Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>> = target.prototype[PROP_DESCRIPTORS];
-        const instance = orgConstructor.apply(this, args);
-
+    target.prototype.ngOnInit = function () {
         if (descriptors) {
-            descriptors.forEach((wrapperDescriptor, orgDescriptor) => {
-                wrapperDescriptor.set.apply(this, [orgDescriptor.get.apply(this)]);
+            descriptors.forEach((descriptorSet) => {
+                if (descriptorSet.original) {
+                    // Initialize getter/setter properties
+                    descriptorSet.wrapped.set.apply(this, [
+                        descriptorSet.original.get.apply(this)
+                    ]);
+                } else if (descriptorSet.wrapped.get == null) {
+                    // Initialize primitive properties without default value (get should stil be null)
+                    descriptorSet.wrapped.set.apply(this, [null]);
+                }
             });
         }
 
-        return instance;
+        if (orgOnInit) {
+            orgOnInit.apply(this);
+        }
     };
-
-    _QueryParameterBindingsWrapper.prototype = orgConstructor.prototype;
-
-    return _QueryParameterBindingsWrapper;
 }
 
 /**
@@ -97,18 +112,20 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
      * This is later used by @InitQueryParameterBindings to init get/set properties
      *
      * @param target The target class
-     * @param newDescriptor The new descriptor
-     * @param orgDescriptor The original descriptor
+     * @param key Property name or symbol
+     * @param wrappedDescriptor The new descriptor
+     * @param originalDescriptor The original descriptor
      */
-    const registerPropertyDescriptor = (target: any, newDescriptor, orgDescriptor) => {
-        if (target && orgDescriptor && newDescriptor) {
-            target[PROP_DESCRIPTORS] = target[PROP_DESCRIPTORS] || new Map<TypedPropertyDescriptor<any>, TypedPropertyDescriptor<any>>();
-            target[PROP_DESCRIPTORS].set(orgDescriptor, newDescriptor);
-        }
+    const registerPropertyDescriptor = (target: any, key: string | symbol, wrappedDescriptor, originalDescriptor) => {
+        target[PROP_DESCRIPTORS] = target[PROP_DESCRIPTORS] || new Map<string, PropertyDescriptorSet>();
+        target[PROP_DESCRIPTORS].set(key, {
+            originalDescriptor: originalDescriptor,
+            wrappedDescriptor: wrappedDescriptor
+        });
     };
 
     /**
-     * Call (safely) the descriptor setter using value in context
+     * Call the descriptor setter using value in context (null safe)
      * @param descriptor The descriptor to call
      * @param value The value to apply as parameter ot set
      * @param context The context to apply the setter in
@@ -120,7 +137,9 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
     };
 
     return function (target: any, key: string, descriptor?: TypedPropertyDescriptor<any>): any {
-        const wrapperDescriptor = {
+        // Define an initial setter on the property, when called (By class construct using default values or by @InitQueryParameterBindings)
+        // initializes The bound query parameter and redefines the getter/setter to reflect furthed changes to the query parameter
+        const wrappedDescriptor = {
             configurable: true,
             enumerable: true,
             set: function (initialValue: any) {
@@ -155,7 +174,7 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
             }
         };
 
-        registerPropertyDescriptor(target, wrapperDescriptor, descriptor);
-        return wrapperDescriptor;
+        registerPropertyDescriptor(target, key, wrappedDescriptor, descriptor);
+        return wrappedDescriptor;
     };
 }
