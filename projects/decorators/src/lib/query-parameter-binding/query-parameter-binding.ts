@@ -119,8 +119,8 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
     const registerPropertyDescriptor = (target: any, key: string | symbol, wrappedDescriptor, originalDescriptor) => {
         target[PROP_DESCRIPTORS] = target[PROP_DESCRIPTORS] || new Map<string, PropertyDescriptorSet>();
         target[PROP_DESCRIPTORS].set(key, {
-            originalDescriptor: originalDescriptor,
-            wrappedDescriptor: wrappedDescriptor
+            original: originalDescriptor,
+            wrapped: wrappedDescriptor
         });
     };
 
