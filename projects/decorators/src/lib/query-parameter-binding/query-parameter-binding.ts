@@ -138,7 +138,7 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
 
     return function (target: any, key: string, descriptor?: TypedPropertyDescriptor<any>): any {
         // Define an initial setter on the property, when called (By class construct using default values or by @InitQueryParameterBindings)
-        // initializes The bound query parameter and redefines the getter/setter to reflect furthed changes to the query parameter
+        // initializes The bound query parameter and redefines the getter/setter to reflect further changes to the query parameter
         const wrappedDescriptor = {
             configurable: true,
             enumerable: true,

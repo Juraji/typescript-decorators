@@ -74,7 +74,10 @@ class WithGetLogicComponent {
 
 
 describe("@QueryParameterBinding", () => {
+
     beforeEach(async(() => {
+        spyOn(BrowserContext, "getPath").and.returnValue("#/test");
+
         TestBed.configureTestingModule({
             declarations: [
                 MixedPropertiesComponent,
@@ -86,10 +89,6 @@ describe("@QueryParameterBinding", () => {
             .compileComponents();
     }));
 
-    beforeEach(() => {
-        spyOn(BrowserContext, "getPath").and.returnValue("#/test");
-    });
-
     describe("with primitive properties", () => {
 
         it("should initialize property with query parameter value on init when query parameter is present", () => {
@@ -97,10 +96,10 @@ describe("@QueryParameterBinding", () => {
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            expect(testComponent.primitiveProperty).toEqual("Test value");
+            expect(component.primitiveProperty).toEqual("Test value");
 
             // Parameter update should not occur
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(0);
@@ -114,10 +113,10 @@ describe("@QueryParameterBinding", () => {
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            expect(testComponent.primitiveProperty).toEqual("Default value");
+            expect(component.primitiveProperty).toEqual("Default value");
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(1);
             expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?other-param=true&property-param=Default+value");
 
@@ -131,12 +130,12 @@ describe("@QueryParameterBinding", () => {
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            expect(testComponent.primitivePropertyNoDefault).toBe(null);
+            expect(component.primitivePropertyNoDefault).toBe(null);
 
-            testComponent.primitivePropertyNoDefault = "New value";
+            component.primitivePropertyNoDefault = "New value";
 
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(2);
             expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?other-param=true&property-param=Default+value");
@@ -153,7 +152,7 @@ describe("@QueryParameterBinding", () => {
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
             // Check initial parameter
@@ -161,18 +160,18 @@ describe("@QueryParameterBinding", () => {
             expect(BrowserContext.getQueryParameters().get("property-param")).toEqual("Initial value");
 
             // Apply new value
-            testComponent.primitiveProperty = "New value";
+            component.primitiveProperty = "New value";
 
             expect(BrowserContext.getQueryParameters().has("property-param")).toBe(true);
             expect(BrowserContext.getQueryParameters().get("property-param")).toEqual("New value");
 
             // Remove parameter on null value
-            testComponent.primitiveProperty = null;
+            component.primitiveProperty = null;
 
             expect(BrowserContext.getQueryParameters().has("property-param")).toBe(false);
 
             // Add parameter on non-null value
-            testComponent.primitiveProperty = "Non-null value";
+            component.primitiveProperty = "Non-null value";
 
             expect(BrowserContext.getQueryParameters().has("property-param")).toBe(true);
             expect(BrowserContext.getQueryParameters().get("property-param")).toEqual("Non-null value");
@@ -197,16 +196,16 @@ describe("@QueryParameterBinding", () => {
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            expect(testComponent.getSetPropertyNoDefault).toBe(null);
+            expect(component.getSetPropertyNoDefault).toBe(null);
 
-            testComponent.getSetPropertyNoDefault = "New value";
-            expect(testComponent._getSetPropertyNoDefault).toEqual("New value");
+            component.getSetPropertyNoDefault = "New value";
+            expect(component._getSetPropertyNoDefault).toEqual("New value");
 
-            testComponent.getSetPropertyNoDefault = "New value 2";
-            expect(testComponent._getSetPropertyNoDefault).toEqual("New value 2");
+            component.getSetPropertyNoDefault = "New value 2";
+            expect(component._getSetPropertyNoDefault).toEqual("New value 2");
 
             // Expectations on parameter updates calls
             expect(pushHistoryStateSpy).toHaveBeenCalledTimes(3);
@@ -226,11 +225,12 @@ describe("@QueryParameterBinding", () => {
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            expect(testComponent.getSetProperty).toEqual("Test value");
-            expect(testComponent._getSetProperty).toEqual("Test value");
+            // Both the getter and the original value should be in sync
+            expect(component.getSetProperty).toEqual("Test value");
+            expect(component._getSetProperty).toEqual("Test value");
 
             // Parameter update should not occur
             expect(pushHistoryStateSpy).toHaveBeenCalledTimes(0);
@@ -244,10 +244,10 @@ describe("@QueryParameterBinding", () => {
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            expect(testComponent.getSetProperty).toEqual("Default value");
+            expect(component.getSetProperty).toEqual("Default value");
             expect(pushHistoryStateSpy).toHaveBeenCalledTimes(1);
             expect(pushHistoryStateSpy).toHaveBeenCalledWith(
                 "#/test?other-param=true&property-param=Default+value&get-set-param=Default+value");
@@ -262,7 +262,7 @@ describe("@QueryParameterBinding", () => {
             const pushHistoryStateSpy = spyOn(BrowserContext, "pushHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(MixedPropertiesComponent);
-            const testComponent = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
             // Check initial parameter
@@ -270,18 +270,18 @@ describe("@QueryParameterBinding", () => {
             expect(BrowserContext.getQueryParameters().get("get-set-param")).toEqual("Initial value");
 
             // Apply new value
-            testComponent.getSetProperty = "New value";
+            component.getSetProperty = "New value";
 
             expect(BrowserContext.getQueryParameters().has("get-set-param")).toBe(true);
             expect(BrowserContext.getQueryParameters().get("get-set-param")).toEqual("New value");
 
             // Remove parameter on null value
-            testComponent.getSetProperty = null;
+            component.getSetProperty = null;
 
             expect(BrowserContext.getQueryParameters().has("get-set-param")).toBe(false);
 
             // Add parameter on non-null value
-            testComponent.getSetProperty = "Non-null value";
+            component.getSetProperty = "Non-null value";
 
             expect(BrowserContext.getQueryParameters().has("get-set-param")).toBe(true);
             expect(BrowserContext.getQueryParameters().get("get-set-param")).toEqual("Non-null value");
@@ -305,11 +305,11 @@ describe("@QueryParameterBinding", () => {
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(WithJSONComponent);
-            const testComponentWithJSON = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            testComponentWithJSON.propertyNoDefault = {prop: "Some string"};
-            testComponentWithJSON.property = null;
+            component.propertyNoDefault = {prop: "Some string"};
+            component.property = null;
 
             // Expectations on parameter updates calls
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(3);
@@ -325,10 +325,10 @@ describe("@QueryParameterBinding", () => {
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
             const fixture = TestBed.createComponent(WithJSONComponent);
-            const testComponentWithJSON = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
 
-            expect(testComponentWithJSON.property).toEqual({prop: "Some string"});
+            expect(component.property).toEqual({prop: "Some string"});
 
             // Expectations on parameter updates calls
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(0);
@@ -342,9 +342,10 @@ describe("@QueryParameterBinding", () => {
             const consoleWarnSpy = spyOn(console, "warn").and.callThrough();
 
             const fixture = TestBed.createComponent(NonStringTypeComponent);
-            const testComponentNonStringType = fixture.componentInstance;
+            const component = fixture.componentInstance;
             fixture.detectChanges();
-            testComponentNonStringType.property = 2;
+
+            component.property = 2;
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "@QueryParameterBinding: Enabling useJSON is recommended for " +
@@ -387,8 +388,11 @@ describe("@QueryParameterBinding", () => {
 
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(0);
 
-            // By design this should work as well. The difference is that now it's not using window.title anymore
+            // By design this should work as well. The difference is that now it's not using document.title anymore,
+            // since the getter is proxied to the query parameter.
+            // If one would like "document.title" to be updated as well, one should implement a setter to do so.
             expect(component.logicalGetter).toEqual("Karma");
+            expect(document.title).toEqual("My test page");
         });
     });
 });
