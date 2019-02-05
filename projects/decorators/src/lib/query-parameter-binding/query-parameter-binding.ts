@@ -33,7 +33,7 @@ export function InitQueryParameterBindings<T extends Function>(target: T) {
                         descriptorSet.original.get.apply(this)
                     ]);
                 } else if (descriptorSet.wrapped.get == null) {
-                    // Initialize primitive properties without default value (get should stil be null)
+                    // Initialize primitive properties without default value (get should still be null)
                     descriptorSet.wrapped.set.apply(this, [null]);
                 }
             });
