@@ -89,6 +89,19 @@ describe("@QueryParameterBinding", () => {
             .compileComponents();
     }));
 
+    describe("with @InitQueryParameterBindings on class", () => {
+        it("should always call through to the original ngOnInit, if one exists", () => {
+            spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams());
+            spyOn(BrowserContext, "replaceHistoryState").and.stub();
+
+            const fixture = TestBed.createComponent(MixedPropertiesComponent);
+            const component = fixture.componentInstance;
+            fixture.detectChanges();
+
+            expect(component.originalNgOnInitCalled).toBeTruthy();
+        });
+    });
+
     describe("with primitive properties", () => {
 
         it("should initialize property with query parameter value on init when query parameter is present", () => {
