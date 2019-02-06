@@ -71,3 +71,8 @@ Would result in console output:
 ```
 Because when `Call 1` and `Call 2` happened the predicate tested to false.
 When `Call 3` happened the predicate tested to true and #barMethod got executed 
+
+## FAQ
+* __Q: Why can't I just use `@DebounceUntil(() => this.predicate1 && this.predicate2)`?__  
+A: Because the predicate function is evaluated out of context. `this` will be undefined at runtime.
+Hence `this` is passed as parameter to the predicate.
