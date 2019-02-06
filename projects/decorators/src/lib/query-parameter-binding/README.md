@@ -14,7 +14,7 @@ Then, whenever the property is updated, the query parameter will be updated to r
     Useful when you want to store non-string type values in the query parameter.
 
 ### Important
-Getter/Setter property initialization only works when the `@InitQueryParameterBindings` decorator is applied to the parent class.
+Binding initialization only works when the `@InitQueryParameterBindings` decorator is applied to the parent class.
 
 ## Example
 ```typescript
