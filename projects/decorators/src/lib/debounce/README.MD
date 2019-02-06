@@ -34,8 +34,8 @@ Because `"Call 3"` is the last call after debounce, Then `Call 2`, since no more
 
 # Method decorator `@DebounceUntil`
 
-Prevent methods from being executed until a predicate tests true.
-Functionally it will prevent execution until the supplied predicate, executing the last invocation.
+Prevent methods from being executed until a predicate tests `true`.
+Functionally it will prevent execution until the supplied predicate tests `true`, executing the last invocation.
 
 ### Factory parameters
 * `predicate: (t: T) => boolean`: A Predicate, accepting the component instance and returning a boolean.
@@ -69,8 +69,8 @@ Would result in console output:
 ```a
 > "Call 3"
 ```
-Because when `Call 1` and `Call 2` happened the predicate tested to false.
-When `Call 3` happened the predicate tested to true and #barMethod got executed 
+Because when `Call 1` and `Call 2` happened when the predicate tested to false.
+When `Call 3` happened the predicate tested to true and `#barMethod` got executed 
 
 ## FAQ
 * __Q: Why can't I just use `@DebounceUntil(() => this.predicate1 && this.predicate2)`?__  
