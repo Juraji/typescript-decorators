@@ -6,7 +6,7 @@
  */
 export function Debounce(delay: number): MethodDecorator {
 
-    return function (target: Object, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+    return function (target: Object, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor {
         let debounceTimeout;
         const originalFn = descriptor.value;
 
