@@ -1,40 +1,30 @@
 /**
  * Decorator for debugging purposes.
  * Wraps the method or property with console.log, logging values, parameters and return values
+ *
+ * @param logErrors Whether to catch and log errors or not
+ *        Caught errors will get rethrown
  */
-export function LogMe() {
+export function LogMe(logErrors: boolean = false) {
 
     const logGetter = (target: any, key: string | symbol, value: any) => {
-        console.log(`LogMe -> ${target.constructor.name}.${key.toString()} GET value:`, value);
+        console.log(`${target.constructor.name}.${key.toString()} GET:`, value);
     };
 
     const logSetter = (target: any, key: string | symbol, arg: any) => {
-        console.log(`LogMe -> ${target.constructor.name}.${key.toString()} SET parameter:`, arg);
+        console.log(`${target.constructor.name}.${key.toString()} SET:`, arg);
     };
 
     const logMethodParameters = (target: any, key: string | symbol, args: any[]) => {
-        let argsDescription: string | { [p: string]: any }[];
-        if (args && args.length > 0) {
-            argsDescription = args.map((value, index) => {
-                return {index: index, type: (typeof value), value: value};
-            });
-        } else {
-            argsDescription = "None";
-        }
-
-        console.log(`LogMe -> ${target.constructor.name}.${key.toString()} arguments:`, argsDescription);
+        console.log(`${target.constructor.name}.${key.toString()} args:`, ...args);
     };
 
     const logMethodReturnValue = (target: any, key: string | symbol, returnValue: any) => {
-        if (returnValue == null) {
-            console.log(`LogMe -> ${target.constructor.name}.${key.toString()} return value:`, "Null");
-        } else {
-            console.log(`LogMe -> ${target.constructor.name}.${key.toString()} return value:`, typeof returnValue, returnValue);
-        }
+        console.log(`${target.constructor.name}.${key.toString()} returned:`, typeof returnValue, returnValue);
     };
 
     const logMethodError = (target: any, key: string | symbol, e: any) => {
-        console.log(`LogMe -> ${target.constructor.name}.${key.toString()} produced an error:`, e);
+        console.log(`${target.constructor.name}.${key.toString()} produced an error:`, e);
     };
 
     return function (target: any, key: string | symbol, descriptor?: PropertyDescriptor): any {
@@ -50,7 +40,9 @@ export function LogMe() {
                         logMethodReturnValue(target, key, returnValue);
                         return returnValue;
                     } catch (e) {
-                        logMethodError(target, key, e);
+                        if (logErrors) {
+                            logMethodError(target, key, e);
+                        }
                         throw e;
                     }
                 };

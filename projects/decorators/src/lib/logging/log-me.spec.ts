@@ -35,7 +35,7 @@ class TestComponent {
     public methodNoArgsNoReturnValue(): void {
     }
 
-    @LogMe()
+    @LogMe(true)
     public methodThrowsError(): void {
         throw new Error("This is an error");
     }
@@ -58,19 +58,19 @@ describe("@LogMe", () => {
         const component = fixture.componentInstance;
 
         // Expect object init to have logged for property2, since it has a default value
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.property2 SET parameter:", "property2 value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.property2 SET:", "property2 value");
 
         expect(component.property2).toEqual("property2 value");
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.property2 GET value:", "property2 value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.property2 GET:", "property2 value");
 
         expect(component.property1).toEqual(undefined);
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.property1 GET value:", undefined);
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.property1 GET:", undefined);
 
         component.property1 = "new property1 value";
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.property1 SET parameter:", "new property1 value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.property1 SET:", "new property1 value");
 
         expect(component.property1).toEqual("new property1 value");
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.property1 GET value:", "new property1 value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.property1 GET:", "new property1 value");
     });
 
     it("should wrap getter/setter properties with GET and SET logging", () => {
@@ -79,13 +79,13 @@ describe("@LogMe", () => {
         const component = fixture.componentInstance;
 
         expect(component.gsProperty).toEqual("gsProperty first value");
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.gsProperty GET value:", "gsProperty first value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.gsProperty GET:", "gsProperty first value");
 
         component.gsProperty = "gsProperty new value";
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.gsProperty SET parameter:", "gsProperty new value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.gsProperty SET:", "gsProperty new value");
 
         expect(component.gsProperty).toEqual("gsProperty new value");
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.gsProperty GET value:", "gsProperty new value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.gsProperty GET:", "gsProperty new value");
 
         expect(component._gsProperty).toEqual("gsProperty new value");
     });
@@ -95,11 +95,8 @@ describe("@LogMe", () => {
         const component = fixture.componentInstance;
 
         component.methodWithArgsAndReturnValue("test", 5);
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.methodWithArgsAndReturnValue arguments:", [
-            {index: 0, type: "string", value: "test"},
-            {index: 1, type: "number", value: 5}
-        ]);
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.methodWithArgsAndReturnValue return value:", "string", "test5");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.methodWithArgsAndReturnValue args:", "test", 5);
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.methodWithArgsAndReturnValue returned:", "string", "test5");
     });
 
     it("should state \"None\" for a method call without parameters", () => {
@@ -107,8 +104,8 @@ describe("@LogMe", () => {
         const component = fixture.componentInstance;
 
         component.methodNoArgsWithReturnValue();
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.methodNoArgsWithReturnValue arguments:", "None");
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.methodNoArgsWithReturnValue return value:", "string", "a value");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.methodNoArgsWithReturnValue args:");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.methodNoArgsWithReturnValue returned:", "string", "a value");
     });
 
     it("should should state \"Null\" when a logged method returns null or undefined", () => {
@@ -116,8 +113,8 @@ describe("@LogMe", () => {
         const component = fixture.componentInstance;
 
         component.methodNoArgsNoReturnValue();
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.methodNoArgsNoReturnValue arguments:", "None");
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.methodNoArgsNoReturnValue return value:", "Null");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.methodNoArgsNoReturnValue args:");
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.methodNoArgsNoReturnValue returned:",  "undefined", undefined);
     });
 
     it("should log method errors (Which might not show due to business logic catching the errors)", () => {
@@ -129,6 +126,6 @@ describe("@LogMe", () => {
         } catch (e) {
             // Caught and discarded
         }
-        expect(logSpy).toHaveBeenCalledWith("LogMe -> TestComponent.methodThrowsError produced an error:", jasmine.any(Error));
+        expect(logSpy).toHaveBeenCalledWith("TestComponent.methodThrowsError produced an error:", jasmine.any(Error));
     });
 });
