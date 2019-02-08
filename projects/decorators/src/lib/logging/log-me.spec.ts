@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { async, TestBed } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { LogMe } from "./log-me";
 
 @Component({selector: "lib-test", template: ""})
@@ -44,14 +44,14 @@ class TestComponent {
 describe("@LogMe", () => {
     let logSpy: jasmine.Spy;
 
-    beforeEach(async(() => {
+    beforeEach(async () => {
         logSpy = spyOn(console, "log").and.callThrough();
 
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
             declarations: [TestComponent]
         })
             .compileComponents();
-    }));
+    });
 
     it("should wrap primitive properties with GET and SET logging", () => {
         const fixture = TestBed.createComponent(TestComponent);

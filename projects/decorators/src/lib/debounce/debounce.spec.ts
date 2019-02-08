@@ -16,12 +16,12 @@ class TestComponent {
 
 describe("@Debounce", () => {
 
-    beforeEach(() => {
+    beforeEach(async () => {
         // Uninstall any installed clock before proceeding
         jasmine.clock().uninstall();
         jasmine.clock().install();
 
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
             declarations: [TestComponent]
         })
             .compileComponents();

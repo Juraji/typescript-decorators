@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { async, TestBed } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { DebounceUntil } from "./debounce-until";
 
 @Component({selector: "lib-test", template: ""})
@@ -18,13 +18,13 @@ class TestComponent {
 
 describe("@DebounceUntil", () => {
 
-    beforeEach(async(() => {
+    beforeEach(async () => {
 
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
             declarations: [TestComponent]
         })
             .compileComponents();
-    }));
+    });
 
     it("should prevent debounced method to be called before the predicate tests true", () => {
         const fixture = TestBed.createComponent(TestComponent);

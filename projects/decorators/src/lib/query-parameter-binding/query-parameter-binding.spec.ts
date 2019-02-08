@@ -1,6 +1,6 @@
 import { InitQueryParameterBindings, QueryParameterBinding } from "./query-parameter-binding";
 import { BrowserContext } from "../browser-context";
-import { async, TestBed } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { Component, OnInit } from "@angular/core";
 
 @Component({selector: "lib-mixed-properties", template: ""})
@@ -75,10 +75,10 @@ class WithGetLogicComponent {
 
 describe("@QueryParameterBinding", () => {
 
-    beforeEach(async(() => {
+    beforeEach(async () => {
         spyOn(BrowserContext, "getPath").and.returnValue("#/test");
 
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
             declarations: [
                 MixedPropertiesComponent,
                 WithJSONComponent,
@@ -87,7 +87,7 @@ describe("@QueryParameterBinding", () => {
             ]
         })
             .compileComponents();
-    }));
+    });
 
     describe("with @InitQueryParameterBindings on class", () => {
         it("should always call through to the original ngOnInit, if one exists", () => {
