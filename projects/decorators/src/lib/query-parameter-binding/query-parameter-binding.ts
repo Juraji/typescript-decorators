@@ -1,4 +1,5 @@
 import { BrowserContext } from "../browser-context";
+import { LogMe } from "../logging/log-me";
 
 const PROP_DESCRIPTORS = "__QPBPropertyDescriptors";
 
@@ -137,6 +138,10 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
     };
 
     return function (target: any, key: string, descriptor?: TypedPropertyDescriptor<any>): any {
+        if (descriptor != null && !descriptor.set) {
+            throw new Error(`Can not bind readonly value: ${target.constructor.name}.${key}`);
+        }
+
         // Define an initial setter on the property, when called (By class construct using default values or by @InitQueryParameterBindings)
         // initializes The bound query parameter and redefines the getter/setter to reflect further changes to the query parameter
         const wrappedDescriptor = {

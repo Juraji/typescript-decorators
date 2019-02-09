@@ -62,17 +62,6 @@ class NonStringTypeComponent {
     public property2 = {};
 }
 
-@Component({selector: "lib-component-with-get-logic", template: ""})
-@InitQueryParameterBindings
-class WithGetLogicComponent {
-
-    @QueryParameterBinding("doc-title")
-    public get logicalGetter(): string {
-        return document.title;
-    }
-}
-
-
 describe("@QueryParameterBinding", () => {
 
     beforeEach(async () => {
@@ -82,8 +71,7 @@ describe("@QueryParameterBinding", () => {
             declarations: [
                 MixedPropertiesComponent,
                 WithJSONComponent,
-                NonStringTypeComponent,
-                WithGetLogicComponent
+                NonStringTypeComponent
             ]
         })
             .compileComponents();
@@ -375,37 +363,43 @@ describe("@QueryParameterBinding", () => {
         });
     });
 
-    describe("with getter only", () => {
-        beforeEach(() => {
-            document.title = "My test page";
-        });
+    describe("with readonly property", () => {
 
-        it("should update the query parameters using the getter", () => {
+        /**
+         * The decorated classes are wrapped within expect functions, since the error will occur
+         * during class prototyping. Which is too soon for Angular's framework to notice.
+         */
+        it("should throw an error stating readonly can not be bound to", () => {
             spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams());
             const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
 
-            const fixture = TestBed.createComponent(WithGetLogicComponent);
-            fixture.detectChanges();
+            expect(() => {
+                @Component({selector: "lib-component-with-get-logic", template: ""})
+                @InitQueryParameterBindings
+                class WithROGetterComponent {
 
-            expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(1);
-            expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?doc-title=My+test+page");
-        });
+                    @QueryParameterBinding("doc-title")
+                    public get readonlyProperty(): string {
+                        return document.title;
+                    }
+                }
+            })
+                .toThrowError("Can not bind readonly value: WithROGetterComponent.readonlyProperty");
 
-        it("should NOT update the query parameters if query parameter was already present", () => {
-            spyOn(BrowserContext, "getQueryParameters").and.returnValue(new URLSearchParams("?doc-title=Karma"));
-            const replaceHistoryStateSpy = spyOn(BrowserContext, "replaceHistoryState").and.stub();
+            // Is not expected to throw an error, since "readonly" is just a compiler keyword.
+            // Runtime would not know about the readonly flag and will still allow assigning a setter.
+            expect(() => {
+                @Component({selector: "lib-component-with-get-logic", template: ""})
+                @InitQueryParameterBindings
+                class WithROPropertyComponent {
 
-            const fixture = TestBed.createComponent(WithGetLogicComponent);
-            const component = fixture.componentInstance;
-            fixture.detectChanges();
+                    @QueryParameterBinding("doc-title")
+                    public readonly readonlyProperty: string;
+                }
+            })
+                .not.toThrowError("Can not bind readonly value: WithROPropertyComponent.readonlyProperty");
 
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(0);
-
-            // By design this should work as well. The difference is that now it's not using document.title anymore,
-            // since the getter is proxied to the query parameter.
-            // If one would like "document.title" to be updated as well, one should implement a setter to do so.
-            expect(component.logicalGetter).toEqual("Karma");
-            expect(document.title).toEqual("My test page");
         });
     });
 });
