@@ -1,5 +1,4 @@
 import { BrowserContext } from "../browser-context";
-import { LogMe } from "../logging/log-me";
 
 const PROP_DESCRIPTORS = "__QPBPropertyDescriptors";
 

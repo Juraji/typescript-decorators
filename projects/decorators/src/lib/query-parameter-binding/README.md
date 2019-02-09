@@ -49,12 +49,6 @@ class Foo {
     public set baz(value: string) {
         this._baz = value;
     }
-    
-    @QueryParameterBinding("corge", {useJSON: true})
-    public get corge(): number {
-        // Getter only with logic output
-        return 1 + 2;
-    }
 }
 ```
 
@@ -101,3 +95,7 @@ A: No, the query parameters are only updated when the properties itself changes.
 
 * __Q: What is `__QPBPropertyDescriptors`, when I check the class prototype in the browser console.__  
 A: This is a registry of property descriptors, used by `@InitQueryParameterBindings` to initialize query parameter binding for getter/setter properties
+
+* __Q: What happens when I use the decorator on a readonly property?__  
+A: Using this decorator on a readonly `get` property will throw an error during class prototype.
+Using this decorator on a property with the keyword `readonly`, would not result in an error, but could cause strange behaviour at runtime. 
