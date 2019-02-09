@@ -350,11 +350,11 @@ describe("@QueryParameterBinding", () => {
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "@QueryParameterBinding: Enabling useJSON is recommended for " +
-                "non-string type properties in NonStringTypeComponent#property (typeof number)");
+                "non-string type properties in NonStringTypeComponent.property (typeof number)");
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "@QueryParameterBinding: Enabling useJSON is recommended for " +
-                "non-string type properties in NonStringTypeComponent#property2 (typeof object)");
+                "non-string type properties in NonStringTypeComponent.property2 (typeof object)");
 
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(3);
             expect(replaceHistoryStateSpy).toHaveBeenCalledWith("#/test?property=1");
@@ -397,7 +397,7 @@ describe("@QueryParameterBinding", () => {
                     public readonly readonlyProperty: string;
                 }
             })
-                .not.toThrowError("Can not bind readonly value: WithROPropertyComponent.readonlyProperty");
+                .not.toThrowError();
 
             expect(replaceHistoryStateSpy).toHaveBeenCalledTimes(0);
         });

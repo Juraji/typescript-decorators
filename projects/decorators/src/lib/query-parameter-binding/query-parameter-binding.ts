@@ -152,7 +152,7 @@ export function QueryParameterBinding(param: string, opts: BindingOptions = {}) 
                 const type = typeof initialValue;
                 if (!opts.useJSON && initialValue != null && type !== "string") {
                     console.warn("@QueryParameterBinding: Enabling useJSON is recommended for non-string type properties in "
-                        + `${target.constructor.name}#${key} (typeof ${type})`);
+                        + `${target.constructor.name}.${key} (typeof ${type})`);
                 }
 
                 // Replace instance property with getter/setter to bind query
